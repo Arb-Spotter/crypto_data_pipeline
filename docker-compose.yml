@@ -1,0 +1,38 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin 
+      POSTGRES_DB: markets
+    ports:
+      - "5432:5432"
+
+  keydb:
+    image: eqalpha/keydb:latest
+    ports:
+      - "6379:6379"
+  
+
+  dagster:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+      - keydb
+
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: my-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: example@example.com  # Change to your desired email
+      PGADMIN_DEFAULT_PASSWORD: pass # Change to your desired password
+    ports:
+      - "9080:80"  # Expose pgAdmin port
+    depends_on:
+      - postgres

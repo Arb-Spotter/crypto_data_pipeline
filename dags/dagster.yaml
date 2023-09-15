@@ -1,0 +1,10 @@
+
+
+
+run_launcher:
+  module: dagster_docker
+  class: DockerRunLauncher
+  config:
+    env_vars:
+      - DATABASE_URL: $DATABASE_URL
+

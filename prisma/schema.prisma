@@ -1,0 +1,63 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider             = "prisma-client-py"
+  recursive_type_depth = 5
+}
+
+
+model tokens {
+  token       String                @unique
+  ohlcv_1min  one_min_ohlcv_data[]
+  ohlcv_1hour one_hour_ohlcv_data[]
+  ohlcv_1day  one_day_ohlcv_data[]
+}
+
+model exchanges {
+  exchange String @unique
+}
+
+model one_min_ohlcv_data {
+  token       String
+  open        Float
+  high        Float
+  low         Float
+  close       Float
+  volume      Float
+  exchange    String
+  updatedAt   DateTime @default(now())
+  tokens      tokens   @relation(fields: [token], references: [token])
+
+  @@id([token, updatedAt, exchange])
+}
+
+model one_hour_ohlcv_data {
+  token       String
+  open        Float
+  high        Float
+  low         Float
+  close       Float
+  volume      Float
+  exchange    String
+  updatedAt   DateTime @default(now())
+  tokens      tokens   @relation(fields: [token], references: [token])
+
+  @@id([token, updatedAt, exchange])
+}
+
+model one_day_ohlcv_data {
+  token       String
+  open        Float
+  high        Float
+  low         Float
+  close       Float
+  volume      Float
+  exchange    String
+  updatedAt   DateTime @default(now())
+  tokens      tokens   @relation(fields: [token], references: [token])
+
+  @@id([token, updatedAt, exchange])
+}
