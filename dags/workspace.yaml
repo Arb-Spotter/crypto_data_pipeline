@@ -1,3 +1,3 @@
 
 load_from:
-  - python_file: my_file.py
+  - python_file: dags/pricing_pipelines/repositories/main_repo.py

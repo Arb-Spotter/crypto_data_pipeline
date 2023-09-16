@@ -1,34 +1,32 @@
 import ccxt
 
-def fetch_top_tokens(exchange):
-    try:
-        markets = exchange.load_markets()
 
-        token_markets = [market for market in markets.values() if market['quote'] != 'USD']
+def get_top_token(limit):
+    exchange = ccxt.binance()
 
-        sorted_tokens = sorted(token_markets, key=lambda market: market['baseVolume'], reverse=True)
+    markets = exchange.load_markets()
 
-        top_30_tokens = sorted_tokens[:30]
+    token_pairs = [pair for pair, data in markets.items() if data['quote'] == 'USDT']
 
-        token_symbols = [market['symbol'] for market in top_30_tokens]
+    sorted_tokens = sorted(token_pairs, key=lambda pair: markets[pair].get('quoteVolume') or -1, reverse=True)
+    top_30_tokens_from_binance = [token.split("/")[0] for token in sorted_tokens]
+    
+    exchange = ccxt.kraken()
 
-        return token_symbols
+    markets = exchange.load_markets()
+    token_pairs = [pair for pair, data in markets.items() if data['quote'].startswith('USDT')]
 
-    except Exception as e:
-        print(f"Error fetching top tokens from Kraken: {str(e)}")
-        return []
+    sorted_tokens = sorted(token_pairs, key=lambda pair: markets[pair].get('quoteVolume') or -1, reverse=True)
+    top_30_tokens_from_kraken = [token.split("/")[0] for token in sorted_tokens]
 
-def main():
-    try:
-        kraken = ccxt.kraken()
-        top_tokens = fetch_top_tokens(kraken)
+    common_tokens = [value for value in top_30_tokens_from_binance if value in top_30_tokens_from_kraken]
 
-        print("Top 30 tokens on Kraken:")
-        for token in top_tokens:
-            print(token)
+    top_tokens = []
 
-    except Exception as e:
-        print(f"Error in main function: {str(e)}")
+    while common_tokens:
+        poped_token = common_tokens.pop(0)
+        if poped_token not in top_tokens:
+            top_tokens.append(poped_token)
 
-if __name__ == "__main__":
-    main()
+    print(f"Total of {len(top_tokens)} \nTokens - {top_tokens}")
+

@@ -1,24 +1,34 @@
 FROM python:3.10-slim
 
+RUN apt update && apt install -y nodejs
+
 RUN mkdir -p /opt/dagster/dagster_home /opt/dagster/app
-
-RUN pip install dagster-webserver dagster-postgres
-
-# Copy your code and workspace to /opt/dagster/app
-COPY dags/ /opt/dagster/app/
 
 COPY requirements.txt .
 
 RUN pip install -r requirements.txt
 
+COPY prisma/ /opt/dagster/app/prisma
+
+RUN python3 -m prisma generate
+
+COPY dags/ /opt/dagster/app/dags
+
+COPY scripts/ /opt/dagster/app/scripts
+
+
 ENV DAGSTER_HOME=/opt/dagster/dagster_home/
 
-# Copy dagster instance YAML to $DAGSTER_HOME
-COPY dags/dagster.yaml /opt/dagster/dagster_home/
+COPY dags/dagster.yaml $DAGSTER_HOME
+COPY dags/workspace.yaml /opt/dagster/app
+
+ENV PYTHONPATH="/opt/dagster/app"
 
 WORKDIR /opt/dagster/app
 
+RUN prisma generate
+
+
 EXPOSE 3000
 
-
-ENTRYPOINT ["dagster-webserver", "-h", "0.0.0.0", "-p", "3000"]
+CMD ["dagster", "dev", "-h", "0.0.0.0", "-p", "3000", "-w", "workspace.yaml"]

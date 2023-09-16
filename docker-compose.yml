@@ -3,32 +3,23 @@ services:
   postgres:
     image: postgres:latest
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin 
-      POSTGRES_DB: markets
+      POSTGRES_USER: $DB_USER
+      POSTGRES_PASSWORD: $DB_PASS
+      POSTGRES_DB: $DB_NAME
     ports:
-      - "5432:5432"
+      - "5454:5432"
+    networks: 
+      - dag_network
 
   keydb:
     image: eqalpha/keydb:latest
     ports:
       - "6379:6379"
+    networks: 
+      - dag_network
   
-
-  dagster:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
-    depends_on:
-      - postgres
-      - keydb
-
-
   pgadmin:
     image: dpage/pgadmin4:latest
-    container_name: my-pgadmin
     environment:
       PGADMIN_DEFAULT_EMAIL: example@example.com  # Change to your desired email
       PGADMIN_DEFAULT_PASSWORD: pass # Change to your desired password
@@ -36,3 +27,33 @@ services:
       - "9080:80"  # Expose pgAdmin port
     depends_on:
       - postgres
+    networks: 
+      - dag_network
+
+  dagster:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: dagster_all_in_one
+    ports:
+      - 3000:3000
+      - 8080:8080
+    environment:
+      DB_URL: $DB_URL
+      DAGSTER_POSTGRES_USER: $DAGSTER_POSTGRES_USER 
+      DAGSTER_POSTGRES_PASSWORD: $DAGSTER_POSTGRES_PASSWORD
+      DAGSTER_POSTGRES_DB: $DAGSTER_POSTGRES_DB
+    depends_on:
+      - postgres
+      - keydb
+    networks: 
+      - dag_network
+    volumes: # Make docker client accessible so we can launch containers using host docker
+      - /run/user/1000/docker.sock:/var/run/docker.sock
+      - /tmp/io_manager_storage:/tmp/io_manager_storage
+
+  
+networks:
+  dag_network:
+    driver: bridge
+    name: dag_network

@@ -1,16 +1,16 @@
-
-
-
+import asyncio
 from dagster import op
-from scripts.top_tokens_binance import get_top_token
+from scripts.top_tokens import get_top_token
+from prisma import Prisma
 
+
+async def insert_to_db(data):
+    async with Prisma() as prisma:
+        await prisma.tokens.create_many(data, skip_duplicates=True)
 
 
 @op()
-def get_tokens():
-    tokens = get_top_token()
-
-    prisma
-
-
-
+def fetch_token_from_binance_op():
+    tokens = get_top_token(30)
+    obj_list = tokens.map(lambda x: {"token": x})
+    asyncio.run(insert_to_db(obj_list))
