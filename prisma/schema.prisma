@@ -1,19 +1,19 @@
+generator client {
+  provider             = "prisma-client-py"
+  previewFeatures      = ["views"]
+  recursive_type_depth = "5"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DB_URL")
 }
 
-generator client {
-  provider             = "prisma-client-py"
-  recursive_type_depth = 5
-}
-
-
 model tokens {
   token       String                @unique
-  ohlcv_1min  one_min_ohlcv_data[]
-  ohlcv_1hour one_hour_ohlcv_data[]
   ohlcv_1day  one_day_ohlcv_data[]
+  ohlcv_1hour one_hour_ohlcv_data[]
+  ohlcv_1min  one_min_ohlcv_data[]
 }
 
 model exchanges {
@@ -21,43 +21,67 @@ model exchanges {
 }
 
 model one_min_ohlcv_data {
-  token       String
-  open        Float
-  high        Float
-  low         Float
-  close       Float
-  volume      Float
-  exchange    String
-  updatedAt   DateTime @default(now())
-  tokens      tokens   @relation(fields: [token], references: [token])
+  token     String
+  open      Float
+  high      Float
+  low       Float
+  close     Float
+  volume    Float
+  exchange  String
+  updatedAt DateTime @default(now())
+  tokens    tokens   @relation(fields: [token], references: [token])
 
   @@id([token, updatedAt, exchange])
 }
 
 model one_hour_ohlcv_data {
-  token       String
-  open        Float
-  high        Float
-  low         Float
-  close       Float
-  volume      Float
-  exchange    String
-  updatedAt   DateTime @default(now())
-  tokens      tokens   @relation(fields: [token], references: [token])
+  token     String
+  open      Float
+  high      Float
+  low       Float
+  close     Float
+  volume    Float
+  exchange  String
+  updatedAt DateTime @default(now())
+  tokens    tokens   @relation(fields: [token], references: [token])
 
   @@id([token, updatedAt, exchange])
 }
 
 model one_day_ohlcv_data {
-  token       String
-  open        Float
-  high        Float
-  low         Float
-  close       Float
-  volume      Float
-  exchange    String
-  updatedAt   DateTime @default(now())
-  tokens      tokens   @relation(fields: [token], references: [token])
+  token     String
+  open      Float
+  high      Float
+  low       Float
+  close     Float
+  volume    Float
+  exchange  String
+  updatedAt DateTime @default(now())
+  tokens    tokens   @relation(fields: [token], references: [token])
 
   @@id([token, updatedAt, exchange])
+}
+
+view ohlcv_1min_gaps {
+  date_series DateTime
+  exchange    String
+  token       String
+
+  @@id([date_series, exchange, token])
+}
+
+view ohlcv_1hour_gaps {
+  date_series DateTime
+  exchange    String
+  token       String
+
+  @@id([date_series, exchange, token])
+}
+
+view ohlcv_1day_gaps {
+  date_series DateTime
+  exchange    String
+  token       String
+
+  @@id([date_series, exchange, token])
 }

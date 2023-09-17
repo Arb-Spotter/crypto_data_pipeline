@@ -30,3 +30,4 @@ def get_top_token(limit):
 
     print(f"Total of {len(top_tokens)} \nTokens - {top_tokens}")
 
+    return top_tokens

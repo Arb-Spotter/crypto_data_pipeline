@@ -16,7 +16,3 @@ def fetch_token_from_binance_job():
 def fetch_top_exchanges_job():
     fetch_top_exchanges_op()
     
-@job
-def fetch_ohlcv_data():
-    # fetch_
-    pass

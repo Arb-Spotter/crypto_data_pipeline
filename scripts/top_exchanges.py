@@ -3,18 +3,21 @@ import asyncio
 
 from multiprocessing import Pool, cpu_count
 
+import logging
+logger = logging.getLogger("mainlog")
+
 
 def fetch_ticker(exchange, symbol):
-    try:
 
+    try:
         ticker = exchange.fetch_ticker(symbol)
-        print("Fetcing ticker from - ", exchange)
+        logger.info("Fetcing ticker from - {}".format(exchange))
         return {
             'exchange': exchange.id,
             'baseVolume': ticker['baseVolume'] if 'baseVolume' in ticker else -1
         }
     except Exception as e:
-        print(e)
+        logger.error("error fetching ticker for - {}, {}".format(exchange, e))
 
 
 def get_top_30_ex():
@@ -41,5 +44,5 @@ def get_top_30_ex():
 
 
     exchanges = [ex["exchange"] for ex in top_30_exchanges] 
-    print("Top 30 exchanges:", exchanges)
+    logger.info("Top 30 exchanges: {}".format(exchanges))
     return exchanges

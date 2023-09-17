@@ -31,4 +31,9 @@ RUN prisma generate
 
 EXPOSE 3000
 
+# CMD ["sh", "-c", "dagster dev -h 0.0.0.0 -p 3000 -w workspace.yaml && prisma migrate deploy"]
+
+# CMD ["prisma migrate deploy --schema=/opt/dagster/app/prisma/schema.prisma"]
+# /opt/dagster/app/prisma
+
 CMD ["dagster", "dev", "-h", "0.0.0.0", "-p", "3000", "-w", "workspace.yaml"]
