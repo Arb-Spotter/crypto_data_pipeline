@@ -1,17 +1,17 @@
 from prisma import Prisma
 
+from dags.pricing_pipelines.operations.exchanges_op import TokenData
+
 exchanges_in_db = []
 total_exchanges_to_maintain = 5
 
-
-table_name_for_candle_size = {
-    "1m": "one_min_ohlcv_data ", 
-    "1h": "one_hour_ohlcv_data ",
-    "1d": "one_day_ohlcv_data "
-}
+import logging
+logger = logging.getLogger("mainlog")
 
 
-async def fetch_ohlcv(token, candle_size):
+
+
+async def fetch_ohlcv(tokens_data: TokenData):
     count = 5
     ex_in_db = []
 
@@ -19,7 +19,3 @@ async def fetch_ohlcv(token, candle_size):
     async with Prisma() as prisma:
         getattr(prisma, table_name)
         prisma.one_day_ohlcv_data.count()
-
-    
-    
-    
