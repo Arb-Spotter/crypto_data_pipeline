@@ -3,33 +3,14 @@ from dagster import DynamicOut, DynamicOutput, In, Output, op
 from dags.pricing_pipelines.assets.tokens_and_exchanges.tokens_and_exchanges_assets import (
     tokens_asset,
 )
-from scripts.ohlcv import fetch_ohlcv
+from dags.pricing_pipelines.utils.common import TokenData, table_name_for_candle_size, days_from_for_candle_size
+from scripts.ohlcv import start_ohlcv_handler
 from scripts.top_exchanges import get_top_30_ex
-from scripts.top_tokens import get_top_token
 from prisma import Prisma
-
 import logging
 
 logger = logging.getLogger("mainlog")
-from dataclasses import dataclass
 
-
-table_name_for_candle_size = {
-    "1m": "one_min_ohlcv_data",
-    "1h": "one_hour_ohlcv_data",
-    "1d": "one_day_ohlcv_data",
-}
-
-days_from_for_candle_size = {"1m": 1, "1h": 30, "1d": 365}
-
-
-@dataclass
-class TokenData:
-    table_name: str
-    exchanges: list
-    token: str
-    candle_size: str
-    days_from: int
 
 
 async def insert_to_db(data):
@@ -87,4 +68,4 @@ async def fetch_ohlcv_data(tokens_data: TokenData, all_top_exchanges):
     top_exchanges_except_in_db = [
         i for i in all_top_exchanges if i not in tokens_data.exchanges
     ]
-    fetch_ohlcv(tokens_data, top_exchanges_except_in_db)
+    await start_ohlcv_handler(tokens_data, top_exchanges_except_in_db)
