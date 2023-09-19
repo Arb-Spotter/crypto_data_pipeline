@@ -1,6 +1,6 @@
 FROM python:3.10-slim
 
-RUN apt update && apt install -y nodejs
+RUN apt update && apt install -y nodejs && apt install -y git
 
 RUN mkdir -p /opt/dagster/dagster_home /opt/dagster/app
 

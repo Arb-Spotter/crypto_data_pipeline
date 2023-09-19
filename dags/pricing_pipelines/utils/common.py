@@ -1,5 +1,7 @@
 
 from dataclasses import dataclass
+import logging
+logger = logging.getLogger("mainlog")
 
 
 table_name_for_candle_size = {
@@ -35,4 +37,4 @@ def print_progress_bar(current_value, total_value, length=50, fill="█", msg = 
     arrow = fill * int(length * progress)
     spaces = " " * (length - len(arrow))
     progress_str = f"[{arrow}{spaces}] {int(progress * 100)}% " + msg
-    logging.info(progress_str)
+    logger.info(progress_str)
