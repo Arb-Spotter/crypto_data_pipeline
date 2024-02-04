@@ -18,7 +18,7 @@ run_launcher:
 
     container_kwargs:
       volumes: # Make docker client accessible to any launched containers as well
-        - /run/user/1000/docker.sock:/var/run/docker.sock
+        - /run/usr/1000/docker.sock:/var/run/docker.sock
         - /tmp/io_manager_storage:/tmp/io_manager_storage
 
 run_storage:
@@ -43,7 +43,6 @@ event_log_storage:
       password: admin
       db_name: postgres
       port: 5432
-
 
 
 python_logs:
