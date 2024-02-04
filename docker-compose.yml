@@ -2,32 +2,33 @@ version: '3'
 services:
   postgres:
     image: postgres:latest
-    environment:
-      POSTGRES_USER: $DB_USER
-      POSTGRES_PASSWORD: $DB_PASS
-      POSTGRES_DB: $DB_NAME
     ports:
       - "5454:5432"
-    networks: 
+    networks:
       - dag_network
+    env_file:
+      - path: ./envs/db.env
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
 
   keydb:
     image: eqalpha/keydb:latest
     ports:
       - "6379:6379"
-    networks: 
+    networks:
       - dag_network
-  
+
   pgadmin:
     image: dpage/pgadmin4:latest
     environment:
-      PGADMIN_DEFAULT_EMAIL: example@example.com  # Change to your desired email
+      PGADMIN_DEFAULT_EMAIL: example@example.com # Change to your desired email
       PGADMIN_DEFAULT_PASSWORD: pass # Change to your desired password
     ports:
-      - "9080:80"  # Expose pgAdmin port
+      - "9080:80" # Expose pgAdmin port
     depends_on:
-      - postgres
-    networks: 
+      dagster:
+        condition: service_started
+    networks:
       - dag_network
 
   dagster:
@@ -38,21 +39,22 @@ services:
     ports:
       - 3000:3000
       - 8080:8080
-    environment:
-      DB_URL: $DB_URL
-      DAGSTER_POSTGRES_USER: $DAGSTER_POSTGRES_USER 
-      DAGSTER_POSTGRES_PASSWORD: $DAGSTER_POSTGRES_PASSWORD
-      DAGSTER_POSTGRES_DB: $DAGSTER_POSTGRES_DB
+    env_file:
+      - path: ./envs/dagster.env
+
     depends_on:
-      - postgres
-      - keydb
-    networks: 
+      postgres:
+        condition: service_healthy
+      keydb:
+        condition: service_started
+
+    networks:
       - dag_network
-    volumes: # Make docker client accessible so we can launch containers using host docker
+    volumes:
+      # Make docker client accessible so we can launch containers using host docker
       - /run/user/1000/docker.sock:/var/run/docker.sock
       - /tmp/io_manager_storage:/tmp/io_manager_storage
 
-  
 networks:
   dag_network:
     driver: bridge
