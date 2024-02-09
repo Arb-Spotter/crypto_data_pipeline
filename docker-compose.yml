@@ -10,6 +10,8 @@ services:
       - path: ./envs/db.env
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready" ]
+    volumes:
+      - pg-data:/var/lib/postgresql/data
 
   keydb:
     image: eqalpha/keydb:latest
@@ -30,6 +32,8 @@ services:
         condition: service_started
     networks:
       - dag_network
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
 
   dagster:
     build:
@@ -59,3 +63,9 @@ networks:
   dag_network:
     driver: bridge
     name: dag_network
+
+volumes:
+  pg-data:
+  pgadmin-data:
+  dagster-data:
+  keydb-data:
