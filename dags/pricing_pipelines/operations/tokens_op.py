@@ -7,16 +7,17 @@ import logging
 
 logger = logging.getLogger("mainlog")
 
+
 async def insert_to_db(data):
     async with Prisma() as prisma:
         await prisma.tokens.create_many(data, skip_duplicates=True)
 
 
 @op()
-def fetch_token_from_binance_op():
-    tokens = get_top_token(30)
+def fetch_token_from_binance_op(exchanges):
+    exchange1, exchange2, *_ = exchanges
+    tokens = get_top_token(exchange1, exchange2, 30)
     logger.info(tokens)
-    
     obj_list = [{"token": x} for x in tokens]
     asyncio.run(insert_to_db(obj_list))
 

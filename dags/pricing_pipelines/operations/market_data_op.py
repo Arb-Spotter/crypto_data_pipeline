@@ -10,7 +10,6 @@ redis_pool = redis.ConnectionPool(host="keydb", port=6379, db=0)
 logger = logging.getLogger("mainlog")
 
 
-
 def get_ticker(token, exchange):
     exchange_obj = getattr(ccxt, exchange)()
 
@@ -89,6 +88,7 @@ async def market_data_op(token_exchange_pairs):
 
         await insert_to_db(data)
         logger.error(f"fetched for iteration-{i}")
+
 
 # {
 #     "symbol": "BTC/USDT",

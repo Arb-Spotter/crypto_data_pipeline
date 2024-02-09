@@ -3,14 +3,17 @@ from dagster import DynamicOut, DynamicOutput, In, Output, op
 from dags.pricing_pipelines.assets.tokens_and_exchanges.tokens_and_exchanges_assets import (
     tokens_asset,
 )
-from dags.pricing_pipelines.utils.common import TokenData, table_name_for_candle_size, days_from_for_candle_size
+from dags.pricing_pipelines.utils.common import (
+    TokenData,
+    table_name_for_candle_size,
+    days_from_for_candle_size,
+)
 from scripts.ohlcv import start_ohlcv_handler
 from scripts.top_exchanges import get_top_30_ex
 from prisma import Prisma
 import logging
 
 logger = logging.getLogger("mainlog")
-
 
 
 async def insert_to_db(data):
@@ -42,6 +45,7 @@ def fetch_top_exchanges_op():
 
     obj_list = [{"exchange": x} for x in top_exchanges]
     asyncio.run(insert_to_db(obj_list))
+    return Output(top_exchanges)
 
 
 async def get_unique_exchanges(prisma, table_name, token):
