@@ -11,6 +11,9 @@ datasource db {
 
 model tokens {
   token       String                @unique
+  name String?
+  thumb String?
+  large String?
   ohlcv_1day  one_day_ohlcv_data[]
   ohlcv_1hour one_hour_ohlcv_data[]
   ohlcv_1min  one_min_ohlcv_data[]
@@ -30,7 +33,7 @@ model one_min_ohlcv_data {
   volume    Float
   exchange  String
   updatedAt DateTime @default(now())
-  tokens    tokens   @relation(fields: [token], references: [token])
+  tokens    tokens   @relation(fields: [token], references: [token], onDelete: Cascade)
 
   @@id([token, updatedAt, exchange])
 }
@@ -44,7 +47,7 @@ model one_hour_ohlcv_data {
   volume    Float
   exchange  String
   updatedAt DateTime @default(now())
-  tokens    tokens   @relation(fields: [token], references: [token])
+  tokens    tokens   @relation(fields: [token], references: [token], onDelete: Cascade)
 
   @@id([token, updatedAt, exchange])
 }
@@ -58,7 +61,7 @@ model one_day_ohlcv_data {
   volume    Float
   exchange  String
   updatedAt DateTime @default(now())
-  tokens    tokens   @relation(fields: [token], references: [token])
+  tokens    tokens   @relation(fields: [token], references: [token], onDelete: Cascade)
 
   @@id([token, updatedAt, exchange])
 }
@@ -99,7 +102,7 @@ model market_data {
   change Float?
   b_a_spread Float?
   updatedAt DateTime @default(now())
-  tokens    tokens   @relation(fields: [token], references: [token])
+  tokens    tokens   @relation(fields: [token], references: [token], onDelete: Cascade)
 
   @@id([token, updatedAt, exchange])
 }
